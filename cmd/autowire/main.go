@@ -101,12 +101,14 @@ type genCmd struct {
 	headerFile     string
 	prefixFileName string
 	tags           string
+	noGoGenerate   bool
 }
 
 func (*genCmd) Name() string { return "gen" }
 func (*genCmd) Synopsis() string {
 	return "generate the autowire_gen.go file for each package"
 }
+
 func (*genCmd) Usage() string {
 	return `gen [packages]
 
@@ -115,10 +117,12 @@ func (*genCmd) Usage() string {
   If no packages are listed, it defaults to ".".
 `
 }
+
 func (cmd *genCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&cmd.headerFile, "header_file", "", "path to file to insert as a header in autowire_gen.go")
 	f.StringVar(&cmd.prefixFileName, "output_file_prefix", "", "string to prepend to output file names.")
 	f.StringVar(&cmd.tags, "tags", "", "append build tags to the default wirebuild")
+	f.BoolVar(&cmd.noGoGenerate, "no_go_generate", false, "disable including '//go:generate wire' directive in output files")
 }
 
 func (cmd *genCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interface{}) subcommands.ExitStatus {
@@ -135,6 +139,7 @@ func (cmd *genCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interfa
 
 	opts.PrefixOutputFile = cmd.prefixFileName
 	opts.Tags = cmd.tags
+	opts.NoAddGenerateDirective = cmd.noGoGenerate
 
 	outs, errs := autowire.Generate(ctx, wd, os.Environ(), packages(f), opts)
 	if len(errs) > 0 {
@@ -171,14 +176,16 @@ func (cmd *genCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interfa
 }
 
 type diffCmd struct {
-	headerFile string
-	tags       string
+	headerFile   string
+	tags         string
+	noGoGenerate bool
 }
 
 func (*diffCmd) Name() string { return "diff" }
 func (*diffCmd) Synopsis() string {
 	return "output a diff between existing autowire_gen.go files and what gen would generate"
 }
+
 func (*diffCmd) Usage() string {
 	return `diff [packages]
 
@@ -191,10 +198,13 @@ func (*diffCmd) Usage() string {
   plus an error if trouble.
 `
 }
+
 func (cmd *diffCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&cmd.headerFile, "header_file", "", "path to file to insert as a header in autowire_gen.go")
 	f.StringVar(&cmd.tags, "tags", "", "append build tags to the default wirebuild")
+	f.BoolVar(&cmd.noGoGenerate, "no_go_generate", false, "disable including '//go:generate wire' directive in output files")
 }
+
 func (cmd *diffCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interface{}) subcommands.ExitStatus {
 	const (
 		errReturn  = subcommands.ExitStatus(2)
@@ -212,6 +222,7 @@ func (cmd *diffCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interf
 	}
 
 	opts.Tags = cmd.tags
+	opts.NoAddGenerateDirective = !cmd.noGoGenerate
 
 	outs, errs := autowire.Generate(ctx, wd, os.Environ(), packages(f), opts)
 	if len(errs) > 0 {
@@ -268,6 +279,7 @@ func (*showCmd) Name() string { return "show" }
 func (*showCmd) Synopsis() string {
 	return "describe all top-level provider sets"
 }
+
 func (*showCmd) Usage() string {
 	return `show [packages]
 
@@ -279,9 +291,11 @@ func (*showCmd) Usage() string {
   If no packages are listed, it defaults to ".".
 `
 }
+
 func (cmd *showCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&cmd.tags, "tags", "", "append build tags to the default wirebuild")
 }
+
 func (cmd *showCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interface{}) subcommands.ExitStatus {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -360,6 +374,7 @@ func (*checkCmd) Name() string { return "check" }
 func (*checkCmd) Synopsis() string {
 	return "print any Autowire errors found"
 }
+
 func (*checkCmd) Usage() string {
 	return `check [-tags tag,list] [packages]
 
@@ -369,9 +384,11 @@ func (*checkCmd) Usage() string {
   If no packages are listed, it defaults to ".".
 `
 }
+
 func (cmd *checkCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&cmd.tags, "tags", "", "append build tags to the default wirebuild")
 }
+
 func (cmd *checkCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interface{}) subcommands.ExitStatus {
 	wd, err := os.Getwd()
 	if err != nil {
