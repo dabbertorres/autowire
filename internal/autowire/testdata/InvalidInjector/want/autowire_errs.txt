@@ -1,0 +1,3 @@
+a call to autowire.Build indicates that this function is an injector, but injectors must consist of only the autowire.Build call and an optional return
+
+a call to autowire.Build indicates that this function is an injector, but injectors must consist of only the autowire.Build call and an optional return
