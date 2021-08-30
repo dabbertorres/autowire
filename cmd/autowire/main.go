@@ -31,8 +31,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/subcommands"
 	"github.com/dabbertorres/autowire/internal/autowire"
+	"github.com/google/subcommands"
 	"github.com/pmezard/go-difflib/difflib"
 	"golang.org/x/tools/go/types/typeutil"
 )
@@ -119,10 +119,10 @@ func (*genCmd) Usage() string {
 }
 
 func (cmd *genCmd) SetFlags(f *flag.FlagSet) {
-	f.StringVar(&cmd.headerFile, "header_file", "", "path to file to insert as a header in autowire_gen.go")
-	f.StringVar(&cmd.prefixFileName, "output_file_prefix", "", "string to prepend to output file names.")
+	f.StringVar(&cmd.headerFile, "header-file", "", "path to file to insert as a header in autowire_gen.go")
+	f.StringVar(&cmd.prefixFileName, "output-file-prefix", "", "string to prepend to output file names.")
 	f.StringVar(&cmd.tags, "tags", "", "append build tags to the default wirebuild")
-	f.BoolVar(&cmd.noGoGenerate, "no_go_generate", false, "disable including '//go:generate wire' directive in output files")
+	f.BoolVar(&cmd.noGoGenerate, "no-go-generate", false, "disable including '//go:generate wire' directive in output files")
 }
 
 func (cmd *genCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interface{}) subcommands.ExitStatus {
@@ -200,9 +200,9 @@ func (*diffCmd) Usage() string {
 }
 
 func (cmd *diffCmd) SetFlags(f *flag.FlagSet) {
-	f.StringVar(&cmd.headerFile, "header_file", "", "path to file to insert as a header in autowire_gen.go")
+	f.StringVar(&cmd.headerFile, "header-file", "", "path to file to insert as a header in autowire_gen.go")
 	f.StringVar(&cmd.tags, "tags", "", "append build tags to the default wirebuild")
-	f.BoolVar(&cmd.noGoGenerate, "no_go_generate", false, "disable including '//go:generate wire' directive in output files")
+	f.BoolVar(&cmd.noGoGenerate, "no-go-generate", false, "disable including '//go:generate wire' directive in output files")
 }
 
 func (cmd *diffCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interface{}) subcommands.ExitStatus {
